@@ -4,28 +4,37 @@ import Axios from 'axios';
 
 export default function App() {
   const [bb, setBb] = useState("")
-  const [bbs, setBbs] = useState(["bb1", "bb2", "bb3"])
+  const [bbs, setBbs] = useState([])
   const [isRefresh, setIsRefresh] = useState(false)
   const [posts, setPosts] = useState([])
 
   const route = "https://glacial-hamlet-05511.herokuapp.com"
 
   useEffect(() => {
+    const getBbs = async () => {
+      let result = { data: [] }
+      result =
+        await Axios.get(
+          route + "/bboardNames"
+        )
+      setBbs(result.data)
+    }
+    getBbs()
+  }, [isRefresh])
+
+  useEffect(() => {
     const getPosts = async () => {
       let result = { data: [] }
       result =
         await Axios.post(
-          route + "/get", bb
+          route + "/posts" , {bboard: bb}
         )
-      console.log(result.data)
+      console.dir(result.data)
       setPosts(result.data)
-      return result.data
     }
+    getPosts()
+  },[bb])
 
-    const ps = getPosts()
-  }, [bb])
-
-  // const get
   const renderBbName = ({ item }) => {
     return (
       <View style={{ padding: 3 }}>
@@ -44,7 +53,10 @@ export default function App() {
   const renderPosts = ({ item }) => {
     return (
       <View style={{ padding: 10 }}>
-        <View style={{ backgroundColor: 'lightgrey', padding: 10 }}><Text style={{ fontSize: 24 }}>{item}</Text></View>
+        <View style={{ backgroundColor: 'lightgrey', padding: 20 }}>
+          <Text style={{ fontSize: 24 }}>{item.title}</Text>
+          <Text style={{ fontSize: 14 }}>{item.text}</Text>
+        </View>
       </View>
     )
   }
@@ -57,11 +69,12 @@ export default function App() {
 
   if (bbs.length != 0) {
     bboardNameList =
-      <View style={{}}>
+      <View>
         <FlatList
           data={bbs}
           renderItem={renderBbName}
           horizontal={true}
+          style={{width: 220}}
         />
       </View>
   }
@@ -75,6 +88,7 @@ export default function App() {
       <FlatList
         data={posts}
         renderItem={renderPosts}
+        keyExtractor = {(item) => (item._id, item.time)}
       />
   }
 
@@ -120,7 +134,7 @@ const styles = StyleSheet.create({
   },
   list: {
     alignItems: 'flex-start',
-    // height: 430,
+    height: 430,
     padding: 5,
   },
 });
