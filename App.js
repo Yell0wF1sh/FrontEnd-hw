@@ -1,59 +1,112 @@
-import React, {useState, useEffect} from 'react';
-import { StyleSheet, Text, View, Button, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, Text, View, Button, TouchableOpacity, FlatList } from 'react-native';
+import Axios from 'axios';
 
 export default function App() {
   const [bb, setBb] = useState("")
-  const [show, setShow] = useState(false)
   const [bbs, setBbs] = useState(["bb1", "bb2", "bb3"])
   const [isRefresh, setIsRefresh] = useState(false)
+  const [posts, setPosts] = useState([])
+
+  const route = "https://glacial-hamlet-05511.herokuapp.com"
+
+  useEffect(() => {
+    const getPosts = async () => {
+      let result = { data: [] }
+      result =
+        await Axios.post(
+          route + "/get", bb
+        )
+      console.log(result.data)
+      setPosts(result.data)
+      return result.data
+    }
+
+    const ps = getPosts()
+  }, [bb])
 
   // const get
+  const renderBbName = ({ item }) => {
+    return (
+      <View style={{ padding: 3 }}>
+        <TouchableOpacity
+          onPress={() => (
+            setBb(item)
+          )}
+          style={{ padding: 3, backgroundColor: 'black' }}
+        >
+          <Text style={{ color: 'red', fontSize: 16 }}>{item}</Text>
+        </TouchableOpacity>
+      </View>
+    )
+  }
+
+  const renderPosts = ({ item }) => {
+    return (
+      <View style={{ padding: 10 }}>
+        <View style={{ backgroundColor: 'lightgrey', padding: 10 }}><Text style={{ fontSize: 24 }}>{item}</Text></View>
+      </View>
+    )
+  }
 
   let flatlist = (<View></View>)
+
+  let bboardSelected = (<View></View>)
 
   let bboardNameList = (<View></View>)
 
   if (bbs.length != 0) {
-    bbs.forEach(element =>
     bboardNameList =
-    <TouchableOpacity
-      onPress={(currentBb) => (
-        setBb(currentBb)
-      )}
-    >
-      {element}
-    </TouchableOpacity>
-    )
-  } 
+      <View style={{}}>
+        <FlatList
+          data={bbs}
+          renderItem={renderBbName}
+          horizontal={true}
+        />
+      </View>
+  }
+
+  if (bb != "") {
+    bboardSelected =
+      <View style={{ padding: 3, backgroundColor: 'black', justifyContent: 'center' }}>
+        <Text style={{ color: 'red', fontSize: 25 }}>{bb}</Text>
+      </View>
+    flatlist =
+      <FlatList
+        data={posts}
+        renderItem={renderPosts}
+      />
+  }
 
   return (
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <Text style={{ color: 'red', fontSize: 25, textAlign: 'center', fontWeight: '600' }}>BBViwer</Text>
-        </View>
-        <View style={{ flexDirection: 'row' }}>
-          <Button 
-            title='REFRESH BBOARDS'
-            onPress={() => (
-              setIsRefresh(true)
-            )}
-          />
-          {bboardNameList}
-        </View>
-        <View>
-          <Text>Selected bboard:</Text>
-        </View>
-        <View style={styles.list}>
-          {flatlist}
-        </View>
-        <View>
-          <Text>DEBUGGING</Text>
-          <Text>bb: {bb}</Text>
-          <Text>show: {show.toString()}</Text>
-          <Text>bbs.length: {bbs.length}</Text>
-        </View>
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={{ color: 'red', fontSize: 25, textAlign: 'center', fontWeight: '600' }}>BBViwer</Text>
       </View>
-    );
+      <View style={{ flexDirection: 'row' }}>
+        <Button
+          title='REFRESH BBOARDS'
+          color='blue'
+          onPress={() => (
+            setIsRefresh(true)
+          )}
+        />
+        {bboardNameList}
+      </View>
+      <View style={{ flexDirection: 'row' }}>
+        <Text style={{ fontSize: 28 }}>Selected bboard:</Text>
+        {bboardSelected}
+      </View>
+      <View style={styles.list}>
+        {flatlist}
+      </View>
+      <View>
+        <Text>DEBUGGING</Text>
+        <Text>bb: {bb}</Text>
+        <Text>bbs.length: {bbs.length}</Text>
+      </View>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -67,7 +120,7 @@ const styles = StyleSheet.create({
   },
   list: {
     alignItems: 'flex-start',
-    height: 430,
+    // height: 430,
     padding: 5,
   },
 });
