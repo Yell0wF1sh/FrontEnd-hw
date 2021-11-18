@@ -27,13 +27,12 @@ export default function App() {
       let result = { data: [] }
       result =
         await Axios.post(
-          route + "/posts" , {bboard: bb}
+          route + "/posts", { bboard: bb }
         )
-      console.dir(result.data)
       setPosts(result.data)
     }
     getPosts()
-  },[bb])
+  }, [bb])
 
   const renderBbName = ({ item }) => {
     return (
@@ -74,7 +73,7 @@ export default function App() {
           data={bbs}
           renderItem={renderBbName}
           horizontal={true}
-          style={{width: 220}}
+          style={{ width: 220 }}
         />
       </View>
   }
@@ -88,14 +87,14 @@ export default function App() {
       <FlatList
         data={posts}
         renderItem={renderPosts}
-        keyExtractor = {(item) => (item._id, item.time)}
+        keyExtractor={(item) => (item._id, item.time)}
       />
   }
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={{ color: 'red', fontSize: 25, textAlign: 'center', fontWeight: '600' }}>BBViwer</Text>
+        <Text style={{ color: 'red', fontSize: 25, textAlign: 'center', fontWeight: '600' }}>BBViewer</Text>
       </View>
       <View style={{ flexDirection: 'row' }}>
         <Button
@@ -118,6 +117,7 @@ export default function App() {
         <Text>DEBUGGING</Text>
         <Text>bb: {bb}</Text>
         <Text>bbs.length: {bbs.length}</Text>
+        <Text>post: {JSON.stringify(posts)}</Text>
       </View>
     </View>
   );
@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
   },
   list: {
     alignItems: 'flex-start',
-    height: 430,
+    height: 400,
     padding: 5,
   },
 });
