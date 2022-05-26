@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, Button, TouchableOpacity, FlatList, SafeAreaView, RefreshControl, Image } from 'react-native';
+import { StyleSheet, Text, View, Button, TouchableOpacity, FlatList, SafeAreaView, RefreshControl, Image, StatusBar } from 'react-native';
 import axios from 'axios';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 
@@ -13,16 +13,17 @@ export default function App() {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
   const showDatePicker = () => {
-    setDatePickerVisibility(true);
+    setDatePickerVisibility(true)
   };
 
   const hideDatePicker = () => {
-    setDatePickerVisibility(false);
+    setDatePickerVisibility(false)
   };
 
   const handleConfirm = (date) => {
-    console.warn("A date has been picked: ", date);
-    hideDatePicker();
+    console.log(date)
+    setDate(date.substring(0, date.indexOf("T")))
+    hideDatePicker()
   };
 
   // useEffect(() => {
@@ -55,34 +56,38 @@ export default function App() {
   }, [date])
 
   const renderLs = ({ item }) => {
-    console.log(item['location'])
     let location = item['location']
-    console.log(item['times']['currently_open'])
     let currently_open = item['times']['currently_open']
-    console.log(item['times']['hours'])
     let hours = item['times']['hours']
-    console.log(item['times']['status'])
     let status = item['times']['status']
     return (
       <Card>
-        <View style={{ fontWeight: 'bold' }}><Text>{location}</Text></View>
+        <View style={{ fontWeight: 'bold' }}>
+          <Text style={{ fontFamily: 'Times', fontSize: 20 }}>
+            {location}
+          </Text>
+        </View>
         <View style={{ flexDirection: 'row' }}>
-          <Text>Currently open:</Text>
-          <Text> </Text>
-          <Text style={{ color: currently_open ? 'green' : 'red' }}>{currently_open ? 'Yes' : 'No'}</Text>
+          <Text style={{ fontFamily: 'Times', fontWeight: 'bold' }}>Currently open: </Text>
+          <Text style={{ fontFamily: 'Times', color: currently_open ? 'green' : 'red' }}>{currently_open ? 'Yes' : 'No'}</Text>
         </View>
         {hours != undefined
-          ? <Text>
-            Hours: from {hours[0].from} to {hours[0].to}
-          </Text>
-          : <Text>
-            Hours: unavailable
-          </Text>
+          ? <View style={{ flexDirection: 'row' }}>
+            <Text style={{ fontFamily: 'Times', fontWeight: 'bold' }}>Hours: </Text>
+            <Text style={{ fontFamily: 'Times', }}>
+              from {hours[0].from} to {hours[0].to}
+            </Text>
+          </View>
+          : <View style={{ flexDirection: 'row' }}>
+            <Text style={{ fontFamily: 'Times', fontWeight: 'bold' }}>Hours: </Text>
+            <Text style={{ fontFamily: 'Times', }}>
+              unavailable
+            </Text>
+          </View>
         }
         <View style={{ flexDirection: 'row' }}>
-          <Text>Status:</Text>
-          <Text> </Text>
-          <Text style={{ color: status.toLowerCase() == 'open' ? 'green' : 'red' }}>{status}</Text>
+          <Text style={{ fontFamily: 'Times', fontWeight: 'bold' }}>Status: </Text>
+          <Text style={{ fontFamily: 'Times', color: status.toLowerCase() == 'open' ? 'green' : 'red' }}>{status}</Text>
         </View>
       </Card>
     )
@@ -107,15 +112,19 @@ export default function App() {
   return (
     <SafeAreaView style={styles.container}>
       {/* {refreshing ? <HoursFlatLs /> : <View></View>} */}
-      <Button title="Show Date Picker" onPress={showDatePicker} style={{ flex: 1 }} />
+      <StatusBar hidden={false} translucent={true} />
+      <View style={{ borderBottomWidth: 1, borderBottomColor: 'grey' }}>
+        <Text style={{ fontSize: 40 }}>Library Hours</Text>
+      </View>
       <DateTimePickerModal
         isVisible={isDatePickerVisible}
         mode="date"
         onConfirm={handleConfirm}
         onCancel={hideDatePicker}
-        style={{ flex: 1 }}
       />
-      <HoursFlatLs style={{ flex: 1 }} />
+
+      <HoursFlatLs />
+      <Button title="Show Date Picker" onPress={showDatePicker} />
     </SafeAreaView>
   );
 }
@@ -143,17 +152,9 @@ const Card = ({ children }) => {
 const styles = StyleSheet.create({
   container: {
     fontFamily: 'Times',
-    height: '100%',
     fontSize: 18,
+    marginTop: 20,
+    marginBottom: 5,
     flex: 1,
   },
-  header: {
-
-  },
-  image: {
-
-  },
-  textBox: {
-
-  }
 });
