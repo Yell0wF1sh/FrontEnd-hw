@@ -1,86 +1,138 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, Button, TouchableOpacity, FlatList, SafeAreaView, RefreshControl } from 'react-native';
+import { StyleSheet, Text, View, Button, TouchableOpacity, FlatList, SafeAreaView, RefreshControl, Image } from 'react-native';
 import axios from 'axios';
+import DatePicker from 'react-native-date-picker'
 
 export default function App() {
   const [day, setDay] = useState("Sunday")
   const [date, setDate] = useState("2022-05-22")
   const [hoursLs, setHoursLs] = useState([])
-  const [list, setList] = useState([])
+  // const [list, setList] = useState([])
+  const list = require('./hourData.json')
   const [refreshing, setRefreshing] = useState(false)
 
-  useEffect(() => {
-    const fetch = async () => {
-      let newList = { data: [] }
-      newList = await axios.get('http://brandaserver.herokuapp.com/getinfo/libraryHours/week')
-      setList(newList.data)
-    }
-    fetch()
-  }, [refreshing])
+
+  // useEffect(() => {
+  //   // const fetch = async () => {
+  //   //   let newList = { data: [] }
+  //   //   newList = await axios.get('http://brandaserver.herokuapp.com/getinfo/libraryHours/week')
+  //   //   console.log(newList)
+  //   //   setList(newList.data)
+  //   // }
+  //   // fetch()
+  //   fetch('http://brandaserver.herokuapp.com/getinfo/libraryHours/week')
+  //     .then((response) => response.json())
+  //     .then((data) => {
+  //       setList(data)
+  //     })
+  //     .catch((error) => console.error(error))
+  // }, [refreshing])
 
   useEffect(() => {
-    console.log(list)
     const found = list.find(element => element['date'] == date)
-    setDay(found['day'])
-    setHoursLs(found['hours'])
+    console.log(found.day)
+    console.log(found.hours)
+    if (found != null) {
+      setDay(found.day)
+      setHoursLs(found.hours)
+    } else {
+      setDay("Error getting date!")
+      setHoursLs([])
+    }
   }, [date])
 
-  function flatlist() {
-    <FlatList
-      data={hoursLs}
-      renderItem={({ item }) => {
-        let location = item['location']
-        let currently_open = item['times']['currently_open']
-        let hours = item['times']['hours']
-        let status = item['times']['status']
-        return (
-          <Card>
-            <View>{location}</View>
-            <View>{currently_open}</View>
-            {hours != undefined ? <View>{hours}</View> : <View></View>}
-            <View>{status}</View>
-          </Card>
-        )
-      }}
-    // refreshControl={
-    //   <RefreshControl
-    //     refreshing={refreshing}
-    //     onRefresh={onRefresh}
-    //   />
-    // }
-    />
+  const renderLs = ({ item }) => {
+    console.log(item['location'])
+    let location = item['location']
+    console.log(item['times']['currently_open'])
+    let currently_open = item['times']['currently_open']
+    console.log(item['times']['hours'])
+    let hours = item['times']['hours']
+    console.log(item['times']['status'])
+    let status = item['times']['status']
+    return (
+      <Card>
+        <View style={{ fontWeight: 'bold' }}><Text>{location}</Text></View>
+        <View style={{ flexDirection: 'row' }}>
+          <Text>Currently open:</Text>
+          <Text> </Text>
+          <Text style={{ color: currently_open ? 'green' : 'red' }}>{currently_open ? 'Yes' : 'No'}</Text>
+        </View>
+        {hours != undefined
+          ? <Text>
+            Hours: from {hours[0].from} to {hours[0].to}
+          </Text>
+          : <Text>
+            Hours: unavailable
+          </Text>
+        }
+        <View style={{ flexDirection: 'row' }}>
+          <Text>Status:</Text>
+          <Text> </Text>
+          <Text style={{ color: status.toLowerCase() == 'open' ? 'green' : 'red' }}>{status}</Text>
+        </View>
+      </Card>
+    )
+  }
+
+  const HoursFlatLs = () => {
+    return (
+      <FlatList
+        data={hoursLs}
+        renderItem={renderLs}
+      // refreshControl={
+      //   <RefreshControl
+      //     refreshing={refreshing}
+      //     onRefresh={onRefresh}
+      //   />
+      // }
+      // style={{ width: '75%' }}
+      />
+    )
   }
 
   return (
-    <SafeAreaView>
-      {refreshing ? flatlist() : <View></View>}
+    <SafeAreaView style={styles.container}>
+      {/* {refreshing ? <HoursFlatLs /> : <View></View>} */}
+
+      <HoursFlatLs />
     </SafeAreaView>
   );
 }
 
 const Card = ({ children }) => {
-  <View style={{
-    width: '100%',
-    borderRadius: 10,
-    backgroundColor: 'white',
-    padding: 5,
-    margin: 10,
-    shadowColor: 'grey',
-    shadowRadius: 10,
-    shadowOffset: {
-      width: 5,
-      height: 5,
-    },
-  }}>
-    {children}
-  </View>
+  return (
+    <View style={{
+      width: '95%',
+      borderRadius: 10,
+      backgroundColor: 'white',
+      padding: 5,
+      margin: 10,
+      shadowColor: 'grey',
+      shadowRadius: 10,
+      shadowOffset: {
+        width: 5,
+        height: 5,
+      },
+    }}>
+      {children}
+    </View>
+  )
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    fontFamily: 'Times',
+    height: '100%',
+    fontSize: 18,
   },
+  header: {
+
+  },
+  image: {
+
+  },
+  textBox: {
+
+  }
 });
