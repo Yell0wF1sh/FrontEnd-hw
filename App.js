@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Button, TouchableOpacity, FlatList, SafeAreaView, RefreshControl, Image } from 'react-native';
 import axios from 'axios';
-import DatePicker from 'react-native-date-picker'
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 export default function App() {
   const [day, setDay] = useState("Sunday")
@@ -10,7 +10,20 @@ export default function App() {
   // const [list, setList] = useState([])
   const list = require('./hourData.json')
   const [refreshing, setRefreshing] = useState(false)
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
+  const showDatePicker = () => {
+    setDatePickerVisibility(true);
+  };
+
+  const hideDatePicker = () => {
+    setDatePickerVisibility(false);
+  };
+
+  const handleConfirm = (date) => {
+    console.warn("A date has been picked: ", date);
+    hideDatePicker();
+  };
 
   // useEffect(() => {
   //   // const fetch = async () => {
@@ -94,8 +107,15 @@ export default function App() {
   return (
     <SafeAreaView style={styles.container}>
       {/* {refreshing ? <HoursFlatLs /> : <View></View>} */}
-
-      <HoursFlatLs />
+      <Button title="Show Date Picker" onPress={showDatePicker} style={{ flex: 1 }} />
+      <DateTimePickerModal
+        isVisible={isDatePickerVisible}
+        mode="date"
+        onConfirm={handleConfirm}
+        onCancel={hideDatePicker}
+        style={{ flex: 1 }}
+      />
+      <HoursFlatLs style={{ flex: 1 }} />
     </SafeAreaView>
   );
 }
@@ -125,6 +145,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Times',
     height: '100%',
     fontSize: 18,
+    flex: 1,
   },
   header: {
 
