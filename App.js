@@ -1,140 +1,86 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, Button, TouchableOpacity, FlatList } from 'react-native';
-import Axios from 'axios';
+import { StyleSheet, Text, View, Button, TouchableOpacity, FlatList, SafeAreaView, RefreshControl } from 'react-native';
+import axios from 'axios';
 
 export default function App() {
-  const [bb, setBb] = useState("")
-  const [bbs, setBbs] = useState([])
-  const [isRefresh, setIsRefresh] = useState(false)
-  const [posts, setPosts] = useState([])
-
-  const route = "https://glacial-hamlet-05511.herokuapp.com"
-
-  useEffect(() => {
-    const getBbs = async () => {
-      let result = { data: [] }
-      result =
-        await Axios.get(
-          route + "/bboardNames"
-        )
-      setBbs(result.data)
-    }
-    getBbs()
-  }, [isRefresh])
+  const [day, setDay] = useState("Sunday")
+  const [date, setDate] = useState("2022-05-22")
+  const [hoursLs, setHoursLs] = useState([])
+  const [list, setList] = useState([])
+  const [refreshing, setRefreshing] = useState(false)
 
   useEffect(() => {
-    const getPosts = async () => {
-      let result = { data: [] }
-      result =
-        await Axios.post(
-          route + "/posts", { bboard: bb }
-        )
-      setPosts(result.data)
+    const fetch = async () => {
+      let newList = { data: [] }
+      newList = await axios.get('http://brandaserver.herokuapp.com/getinfo/libraryHours/week')
+      setList(newList.data)
     }
-    getPosts()
-  }, [bb])
+    fetch()
+  }, [refreshing])
 
-  const renderBbName = ({ item }) => {
-    return (
-      <View style={{ padding: 3 }}>
-        <TouchableOpacity
-          onPress={() => (
-            setBb(item)
-          )}
-          style={{ padding: 3, backgroundColor: 'black' }}
-        >
-          <Text style={{ color: 'red', fontSize: 16 }}>{item}</Text>
-        </TouchableOpacity>
-      </View>
-    )
-  }
+  useEffect(() => {
+    console.log(list)
+    const found = list.find(element => element['date'] == date)
+    setDay(found['day'])
+    setHoursLs(found['hours'])
+  }, [date])
 
-  const renderPosts = ({ item }) => {
-    return (
-      <View style={{ padding: 10 }}>
-        <View style={{ backgroundColor: 'lightgrey', padding: 20 }}>
-          <Text style={{ fontSize: 24 }}>{item.title}</Text>
-          <Text style={{ fontSize: 14 }}>{item.text}</Text>
-        </View>
-      </View>
-    )
-  }
-
-  let flatlist = (<View></View>)
-
-  let bboardSelected = (<View></View>)
-
-  let bboardNameList = (<View></View>)
-
-  if (bbs.length != 0) {
-    bboardNameList =
-      <View>
-        <FlatList
-          data={bbs}
-          renderItem={renderBbName}
-          horizontal={true}
-          style={{ width: 220 }}
-        />
-      </View>
-  }
-
-  if (bb != "") {
-    bboardSelected =
-      <View style={{ padding: 3, backgroundColor: 'black', justifyContent: 'center' }}>
-        <Text style={{ color: 'red', fontSize: 25 }}>{bb}</Text>
-      </View>
-    flatlist =
-      <FlatList
-        data={posts}
-        renderItem={renderPosts}
-        keyExtractor={(item) => (item._id, item.time)}
-      />
+  function flatlist() {
+    <FlatList
+      data={hoursLs}
+      renderItem={({ item }) => {
+        let location = item['location']
+        let currently_open = item['times']['currently_open']
+        let hours = item['times']['hours']
+        let status = item['times']['status']
+        return (
+          <Card>
+            <View>{location}</View>
+            <View>{currently_open}</View>
+            {hours != undefined ? <View>{hours}</View> : <View></View>}
+            <View>{status}</View>
+          </Card>
+        )
+      }}
+    // refreshControl={
+    //   <RefreshControl
+    //     refreshing={refreshing}
+    //     onRefresh={onRefresh}
+    //   />
+    // }
+    />
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={{ color: 'red', fontSize: 25, textAlign: 'center', fontWeight: '600' }}>BBViewer</Text>
-      </View>
-      <View style={{ flexDirection: 'row' }}>
-        <Button
-          title='REFRESH BBOARDS'
-          color='blue'
-          onPress={() => (
-            setIsRefresh(true)
-          )}
-        />
-        {bboardNameList}
-      </View>
-      <View style={{ flexDirection: 'row' }}>
-        <Text style={{ fontSize: 28 }}>Selected bboard:</Text>
-        {bboardSelected}
-      </View>
-      <View style={styles.list}>
-        {flatlist}
-      </View>
-      <View>
-        <Text>DEBUGGING</Text>
-        <Text>bb: {bb}</Text>
-        <Text>bbs.length: {bbs.length}</Text>
-        <Text>post: {JSON.stringify(posts)}</Text>
-      </View>
-    </View>
+    <SafeAreaView>
+      {refreshing ? flatlist() : <View></View>}
+    </SafeAreaView>
   );
+}
+
+const Card = ({ children }) => {
+  <View style={{
+    width: '100%',
+    borderRadius: 10,
+    backgroundColor: 'white',
+    padding: 5,
+    margin: 10,
+    shadowColor: 'grey',
+    shadowRadius: 10,
+    shadowOffset: {
+      width: 5,
+      height: 5,
+    },
+  }}>
+    {children}
+  </View>
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-  },
-  header: {
-    backgroundColor: 'black',
-    paddingVertical: 20,
-  },
-  list: {
-    alignItems: 'flex-start',
-    height: 400,
-    padding: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

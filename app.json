@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Quiz5",
-    "slug": "Quiz5",
+    "name": "FrontEnd-hw",
+    "slug": "FrontEnd-hw",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
