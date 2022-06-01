@@ -23,6 +23,7 @@
     "react-native": "https://github.com/expo/react-native/archive/sdk-45.0.0.tar.gz",
     "react-native-date-picker": "^4.2.2",
     "react-native-date-picker-select": "^1.0.2",
+    "react-native-drawer": "^2.5.1",
     "react-native-maps": "0.30.2",
     "react-native-modal-datetime-picker": "^13.1.2",
     "react-native-web": "0.17.7"

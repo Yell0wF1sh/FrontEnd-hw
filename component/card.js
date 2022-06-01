@@ -28,6 +28,7 @@ const Card = ({ location, currently_open, hours, status }) => {
     return (
         <View style={{
             width: '95%',
+            height: 'auto',
             borderRadius: 10,
             backgroundColor: 'white',
             padding: 5,
@@ -40,8 +41,8 @@ const Card = ({ location, currently_open, hours, status }) => {
             },
         }}>
             <View style={{ flexDirection: 'row', flex: 1 }}>
-                <Image source={imageUri[0][location]} style={{ flex: 1, marginRight: 2 }} />
-                <View style={{ flex: 2, marginLeft: 2, alignItems: 'center' }}>
+                <Image source={imageUri[0][location]} style={{ marginRight: 2, flex: 1, height: '100%' }} resizeMode={'contain'} />
+                <View style={{ marginLeft: 2, alignItems: 'center', flex: 2 }}>
                     <View>
                         <Text style={{ fontWeight: 'bold', fontFamily: 'Times', fontSize: 20, textAlign: 'center' }}>
                             {location}

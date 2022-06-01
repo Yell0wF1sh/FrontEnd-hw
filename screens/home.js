@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, FlatList, SafeAreaView, StatusBar } from 'react-native';
+import { StyleSheet, Text, View, FlatList, SafeAreaView, StatusBar, Button } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import moment from 'moment';
 import Card from '../component/card';
 
-function home_screen({ navigation }) {
+function Home_screen({ navigation }) {
     return (
         <Home />
     )
@@ -20,20 +20,21 @@ const Home = () => {
     const [open, setOpen] = useState(false)
 
     // useEffect(() => {
-    //   // const fetch = async () => {
-    //   //   let newList = { data: [] }
-    //   //   newList = await axios.get('http://brandaserver.herokuapp.com/getinfo/libraryHours/week')
-    //   //   console.log(newList)
-    //   //   setList(newList.data)
-    //   // }
-    //   // fetch()
-    //   fetch('http://brandaserver.herokuapp.com/getinfo/libraryHours/week')
-    //     .then((response) => response.json())
-    //     .then((data) => {
-    //       setList(data)
-    //     })
-    //     .catch((error) => console.error(error))
-    // }, [refreshing])
+    //     // const fetch = async () => {
+    //     //   let newList = { data: [] }
+    //     //   newList = await axios.get('http://brandaserver.herokuapp.com/getinfo/libraryHours/week')
+    //     //   console.log(newList)
+    //     //   setList(newList.data)
+    //     // }
+    //     // fetch()
+    //     fetch('http://brandaserver.herokuapp.com/getinfo/libraryHours/week')
+    //         .then((response) => response.json())
+    //         .then((data) => {
+    //             setList(data)
+    //         })
+    //         .catch((error) => console.error(error))
+    //     setRefreshing(false)
+    // }, [])
 
     useEffect(() => {
         const found = list.find(element => element['date'] == date)
@@ -59,6 +60,7 @@ const Home = () => {
                 currently_open={currently_open}
                 hours={hours}
                 status={status}
+                style={{ maxHeight: '20%' }}
             />
         )
     }
@@ -81,11 +83,14 @@ const Home = () => {
 
     return (
         <SafeAreaView style={styles.container}>
-            {/* {refreshing ? <HoursFlatLs /> : <View></View>} */}
             <StatusBar hidden={false} translucent={true} />
             <View style={{ borderBottomWidth: 1, borderBottomColor: 'grey' }}>
                 <Text style={{ fontSize: 40 }}>Library Hours</Text>
             </View>
+            {/* <Button
+                onPress={setRefreshing(true)}
+                title="update"
+            /> */}
             <View style={{ paddingTop: 5, flexDirection: 'row', justifyContent: 'center' }}>
                 <Text style={{ fontSize: 20 }}>{day}   </Text>
                 <Picker
@@ -119,4 +124,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default home_screen
+export default Home_screen
